@@ -86,7 +86,7 @@ export function CreateSync() {
       =============================== */}
       {previewQuery.data?.rows && !previewQuery.isLoading && (
         <>
-        <div className="pointer-events-none">
+        <div className="">
 
           <SheetPreview columns={previewQuery.data.columns}rows={previewQuery.data.rows} />
         </div>

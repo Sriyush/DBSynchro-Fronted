@@ -1,19 +1,16 @@
 import type { CreateSync } from "@/types/types";
 import { supabase } from "../provider/supabaseClient";
-import { refreshGoogleToken } from "./auth";
-// import { loginWithGoogle } from "./auth";
+import { getValidGoogleToken } from "./auth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 async function getTokens() {
   const session = await supabase.auth.getSession();
 
   const token = session.data.session?.access_token || null;
-  let googleToken = session.data.session?.provider_token ;
 
-  // If missing → ask Google for new token
+  let googleToken = session.data.session?.provider_token || null;
   if (!googleToken) {
-    const refreshed = await refreshGoogleToken();
-    googleToken = typeof refreshed === "string" ? refreshed : null;
+    throw new Error("Missing Google provider token");
   }
 
   return { token, googleToken };

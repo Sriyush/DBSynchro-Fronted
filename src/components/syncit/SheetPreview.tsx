@@ -6,7 +6,7 @@ export function SheetPreview({
   rows: (string | number)[][];
 }) {
   return (
-    <div className="overflow-auto border-6 border-black rounded-xl p-2">
+    <div className="overflow-auto border-6 border-black rounded-xl max-h-[500px] max-w-4xl mx-auto p-2">
       <table className="w-full border-collapse ">
         
         {/* Header */}
