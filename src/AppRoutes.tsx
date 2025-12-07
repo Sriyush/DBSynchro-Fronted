@@ -19,6 +19,7 @@ export function AppRoutes(){
                     <MainRoutes/>
                 </motion.div>
             </AnimatePresence>
+            
         </div>
     )
 }

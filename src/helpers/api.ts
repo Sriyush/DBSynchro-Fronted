@@ -1,5 +1,6 @@
 import type { CreateSync } from "@/types/types";
 import { supabase } from "../provider/supabaseClient";
+import { refreshGoogleToken } from "./auth";
 // import { loginWithGoogle } from "./auth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
@@ -7,15 +8,18 @@ async function getTokens() {
   const session = await supabase.auth.getSession();
 
   const token = session.data.session?.access_token || null;
-  const googleToken = session.data.session?.provider_token || localStorage.getItem("google_token");
+  let googleToken = session.data.session?.provider_token ;
 
-  // update localStorage to keep Google token if it disappears in session refresh
-  if (session.data.session?.provider_token) {
-    localStorage.setItem("google_token", googleToken!);
+  // If missing → ask Google for new token
+  if (!googleToken) {
+    const refreshed = await refreshGoogleToken();
+    googleToken = typeof refreshed === "string" ? refreshed : null;
   }
 
   return { token, googleToken };
 }
+
+
 
 export async function UserData(){
 const { token, googleToken } = await getTokens();
@@ -47,14 +51,17 @@ const { token, googleToken } = await getTokens();
     return res.json();
 }
 
-export async function previewSheet(sheetId: string , ) {
+export async function previewSheet(sheetId: string ,tab?: string ) {
 const { token, googleToken } = await getTokens();
-    const res = await fetch(`${BACKEND_URL}/api/preview?sheetId=${sheetId}`, {
+  const params = new URLSearchParams({ sheetId });
+  if (tab && tab.trim() !== "default") params.append("tab", tab);
+
+    const res = await fetch(`${BACKEND_URL}/api/preview?${params.toString()}`, {
         method: "GET",
         headers: {
             Authorization: `Bearer ${token}`,
             "provider-token": `${googleToken}`
-        },
+        },  
 
     })
 
@@ -63,6 +70,7 @@ const { token, googleToken } = await getTokens();
 
 export async function createSync(body: CreateSync) {   
     const { token, googleToken } = await getTokens(); 
+    
     const res = await fetch(`${BACKEND_URL}/sync/create`, {
         method: "POST",
         headers: {
@@ -75,8 +83,9 @@ export async function createSync(body: CreateSync) {
     return res.json();
 }
 
-export async function fetchSheet(sheetId: string) {
+export async function fetchSheet(sheetId: string, ) {
     const { token, googleToken } = await getTokens();
+    
     const res = await fetch(`${BACKEND_URL}/api/check/${sheetId}`,{
         method: "GET",
         headers: {

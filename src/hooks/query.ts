@@ -5,7 +5,9 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: UserData,
-    retry: false,       
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,    
   });
 }
 
@@ -15,12 +17,14 @@ export function useRunSync(){
     })
 }
 
-export function usePreviewSheet(sheetId: string){
+export function usePreviewSheet(sheetId: string, tab?: string) {
   return useQuery({
-    queryKey: ["preview", sheetId],
-    queryFn: () => previewSheet(sheetId),
-     enabled: !!sheetId,
-  })
+    queryKey: ["preview", sheetId, tab ?? "default"],
+    queryFn: () => previewSheet(sheetId, tab),
+    enabled: !!sheetId ,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 }
 
 export function useCreateSync(){
@@ -34,5 +38,7 @@ export function useCheckTable(sheetId: string) {
     queryKey: ["checkTable", sheetId],
     queryFn: () => fetchSheet(sheetId),
     enabled: !!sheetId,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
