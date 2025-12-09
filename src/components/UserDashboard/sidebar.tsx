@@ -5,7 +5,7 @@ export function Sidebar({info, tables}: {info: User | null, tables:TableInfo[] |
 
 
   return (
-    <aside className="w-120 bg-white shadow rounded-xl p-6  my-2 sticky border-6 border-black">
+    <aside className="w-120 bg-white shadow rounded-xl p-6  my-2  border-6 border-black h-[calc(100vh-120px)] sticky top-24">
       {/* USER CARD */}
       <div className="flex flex-col items-center text-center">
         <img

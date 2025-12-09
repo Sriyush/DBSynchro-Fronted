@@ -1,13 +1,15 @@
-import { useViewTable } from "@/hooks/query";
+import type { useViewTable } from "@/hooks/query";
 
 export function ViewTableModal({
   tableName,
+  query,
   onClose,
 }: {
   tableName: string;
+  query: ReturnType<typeof useViewTable>;
   onClose: () => void;
 }) {
-  const { data, isLoading, isError } = useViewTable(tableName);
+  const { data, isLoading, isError } = query;
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-2xl max-h-[80vh] overflow-auto w-full max-w-4xl">
@@ -37,9 +39,9 @@ export function ViewTableModal({
           </thead>
 
           <tbody>
-            {data.rows.map((row: any, idx: number) => (
-              <tr key={idx}>
-                {data.columns.map((col: string) => (
+            {data.rows.map((row: any, i: number) => (
+              <tr key={i}>
+                {data.columns.map((col:string) => (
                   <td key={col} className="border p-2">
                     {row[col]}
                   </td>

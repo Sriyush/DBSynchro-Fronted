@@ -10,7 +10,9 @@ export function UserDashboard() {
     <div className="flex pt-20 px-10 gap-10 min-h-screen bg-gray-50   ">
       <Sidebar  info={user} tables={tables}/>
 
-      <MainContent user={user} tables={tables} />
+      <div className="flex-1 overflow-y-auto pb-20">
+        <MainContent user={user} tables={tables} />
+      </div>
     </div>
   );
 }

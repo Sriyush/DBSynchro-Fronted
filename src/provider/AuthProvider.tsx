@@ -16,7 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: session.user.email!,
           name: session.user.user_metadata.full_name,
           avatar: session.user.user_metadata.avatar_url,
-          tables: [], // initially empty
+          tables: [],
         });
       }
     });

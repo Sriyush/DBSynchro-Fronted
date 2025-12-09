@@ -1,4 +1,4 @@
-export function ColumnMapping({ columns, mapping, setMapping }: any) {
+export function ColumnMapping({ columns, setMapping }: any) {
   const handleChange = (col: string, val: string) => {
     setMapping((p: any) => ({ ...p, [col]: val }));
   };
