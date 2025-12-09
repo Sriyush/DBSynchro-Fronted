@@ -1,4 +1,4 @@
-import { usePreviewSheet, useCheckTable } from "@/hooks/query";
+import { usePreviewSheet,  useCreateTable} from "@/hooks/query";
 import { extractSheetId } from "@/helpers/helperFuncs";
 import { useEffect, useState } from "react";
 import { SheetPreview } from "./SheetPreview";
@@ -22,7 +22,11 @@ export function CreateSync() {
 
     setSelectedSheet(null);
   };
-  const tableCheck = useCheckTable(sheetId);
+  // const tableCheck = useCheckTable(sheetId);
+  const createTableMutation = useCreateTable(sheetId);
+  // const createSyncMutation = useCreateSync();
+  // const runSyncMutation = useRunSync();
+
 
   useEffect(() => {
     if (!sheetId) return;
@@ -66,7 +70,7 @@ export function CreateSync() {
         )}
       </div>
 
-      {previewQuery.isLoading && (
+      {previewQuery.isPending && (
         <div className="flex justify-center py-10">
           <div className="animate-spin h-10 w-10 border-4 border-black border-t-transparent rounded-full"></div>
         </div>
@@ -84,28 +88,88 @@ export function CreateSync() {
       {/* ==============================
           SHOW PREVIEW WHEN DATA EXISTS
       =============================== */}
-      {previewQuery.data?.rows && !previewQuery.isLoading && (
-        <>
-        <div className="">
+{previewQuery.data?.rows && !previewQuery.isPending && (
+  <>
+    <SheetPreview
+      columns={previewQuery.data.columns}
+      rows={previewQuery.data.rows}
+    />
 
-          <SheetPreview columns={previewQuery.data.columns}rows={previewQuery.data.rows} />
-        </div>
+<div className="mt-6 flex gap-4">
 
-          {tableCheck.data && (
-            <div className="text-center mt-3 font-medium">
-              {tableCheck.data.exists ? (
-                <span className="text-yellow-600">
-                  ⚠ Table already exists — update mapping
-                </span>
-              ) : (
-                <span className="text-green-600">
-                  ✔ Table will be created automatically
-                </span>
-              )}
-            </div>
-          )}
-        </>
-      )}
+  {/* 1️⃣ CREATE TABLE */}
+  <button
+    onClick={() =>
+      createTableMutation.mutate({
+        selectedSheet: selectedSheet!,
+        columns: previewQuery.data.columns,
+        rows: previewQuery.data.rows
+      })
+    }
+    disabled={createTableMutation.isPending}
+    className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+  >
+    {createTableMutation.isPending ? "Creating..." : "Create Table"}
+  </button>
+
+  {/* 2️⃣ CREATE CONFIG */}
+  {/* <button
+    onClick={() => {
+      // const tableName = prompt("Enter table name for sync:");
+      // if (!tableName) return;
+
+      const mapping: Record<string, string> = {};
+      previewQuery.data.columns.forEach((col: string) => {
+        mapping[col] = col.replace(/\s+/g, "_").toLowerCase();
+      });
+
+      createSyncMutation.mutate({
+        sheetId,
+        sheetRange: selectedSheet!,
+        userTableId: 1,
+        mapping,
+      });
+    }}
+    disabled={createSyncMutation.isPending}
+    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 disabled:opacity-50"
+  >
+    {createSyncMutation.isPending ? "Saving..." : "Save Sync Config"}
+  </button> */}
+
+  {/* 3️⃣ RUN SYNC */}
+  {/* <button
+    onClick={() => {
+      const configId = prompt("Enter config ID to run sync:");
+      if (!configId) return;
+
+      runSyncMutation.mutate(Number(configId));
+    }}
+    disabled={runSyncMutation.isPending}
+    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 disabled:opacity-50"
+  >
+    {runSyncMutation.isPending ? "Running..." : "Run Sync"}
+  </button> */}
+
+</div>
+
+
+    {/* STATUS */}
+    {/* {tableCheck.data && (
+      <div className="text-center mt-3 font-medium">
+        {tableCheck.data.exists ? (
+          <span className="text-yellow-600">
+            ⚠ Table already exists — update mapping
+          </span>
+        ) : (
+          <span className="text-green-600">
+            ✔ Table will be created automatically
+          </span>
+        )}
+      </div>
+    )} */}
+  </>
+)}
+
     </div>
   );
 }

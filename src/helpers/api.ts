@@ -1,6 +1,5 @@
-import type { CreateSync } from "@/types/types";
 import { supabase } from "../provider/supabaseClient";
-import { getValidGoogleToken } from "./auth";
+// import { getValidGoogleToken } from "./auth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 async function getTokens() {
@@ -36,16 +35,20 @@ const { token, googleToken } = await getTokens();
 
     return res.json();
 }
-export async function runSync(id: number) {
-const { token, googleToken } = await getTokens();
-    const res = await fetch(`${BACKEND_URL}/sync/run/${id}`, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "provider-token": `${googleToken}`
-        },
-    });
-    return res.json();
+
+export async function viewTable(tableName: string) {
+  const { token, googleToken } = await getTokens();
+
+  const res = await fetch(`${BACKEND_URL}/api/table/${tableName}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "provider-token": googleToken,
+    },
+  });
+
+  if (!res.ok) throw new Error("Failed to load table");
+
+  return res.json();
 }
 
 export async function previewSheet(sheetId: string ,tab?: string ) {
@@ -65,34 +68,40 @@ const { token, googleToken } = await getTokens();
     return res.json();
 }
 
-export async function createSync(body: CreateSync) {   
-    const { token, googleToken } = await getTokens(); 
-    
-    const res = await fetch(`${BACKEND_URL}/sync/create`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "provider-token": `${googleToken}`
-        },
-        body: JSON.stringify(body),
-    });
-    return res.json();
-}
 
-export async function fetchSheet(sheetId: string, ) {
-    const { token, googleToken } = await getTokens();
-    
-    const res = await fetch(`${BACKEND_URL}/api/check/${sheetId}`,{
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "provider-token": `${googleToken}`
-        },
-        body: JSON.stringify(sheetId),
+export async function handleCreateTable(
+  sheetId: string,
+  selectedSheet: string,
+  columns: string[],
+  rows: string[][],
+) {
+  if (!sheetId || !selectedSheet) return;
 
-    })
+  const tableName = prompt(
+    "Enter table name:",
+    selectedSheet.replace(/\s+/g, "_")
+  );
 
-    return res.json();
+  if (!tableName) return;
+
+  const { token, googleToken } = await getTokens();
+
+  const res = await fetch(`${BACKEND_URL}/sync/create-table`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "provider-token": googleToken,
+    },
+    body: JSON.stringify({
+      sheetId,          // 👈 NEW
+      sheetTab: selectedSheet, // 👈 NEW
+      tableName,
+      columns,
+      rows,
+    }),
+  });
+
+  const data = await res.json();
+  alert("Table created: " + data.table.tableName);
 }

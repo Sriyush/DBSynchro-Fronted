@@ -1,5 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createSync, fetchSheet, previewSheet, runSync, UserData } from "../helpers/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+
+  previewSheet,
+  UserData,
+  handleCreateTable,
+  viewTable,
+} from "../helpers/api";
 
 export function useMe() {
   return useQuery({
@@ -7,38 +13,48 @@ export function useMe() {
     queryFn: UserData,
     retry: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,    
+    refetchOnReconnect: false,
   });
 }
 
-export function useRunSync(){
-    return useMutation({
-        mutationFn: (id: number) => runSync(id),
-    })
-}
 
 export function usePreviewSheet(sheetId: string, tab?: string) {
   return useQuery({
     queryKey: ["preview", sheetId, tab ?? "default"],
     queryFn: () => previewSheet(sheetId, tab),
-    enabled: !!sheetId ,
+    enabled: !!sheetId,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
 }
 
-export function useCreateSync(){
+
+export function useCreateTable(sheetId: string) {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: createSync
-  })
+    mutationFn: ({
+      selectedSheet,
+      columns,
+      rows,
+    }: {
+      selectedSheet: string;
+      columns: string[];
+      rows: string[][];
+    }) =>
+      handleCreateTable(sheetId, selectedSheet, columns,rows),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["checkTable", sheetId] });
+    },
+  });
 }
 
-export function useCheckTable(sheetId: string) {
+export function useViewTable(tableName: string | null) {
   return useQuery({
-    queryKey: ["checkTable", sheetId],
-    queryFn: () => fetchSheet(sheetId),
-    enabled: !!sheetId,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+    queryKey: ["view-table", tableName],
+    queryFn: () => viewTable(tableName!),
+    enabled: !!tableName,
+  });
 }
+

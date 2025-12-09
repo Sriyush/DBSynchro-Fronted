@@ -3,7 +3,7 @@ import { useUser } from "../../store/ZustandStore";
 import { loginWithGoogle, logout } from "../../helpers/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 
 export function Navbar() {
   const user = useUser((s) => s.user);
@@ -66,16 +66,25 @@ export function Navbar() {
           <AnimatePresence>
             {open && (
               <motion.div
-                className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden "
+                className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden"
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
                 style={{ width: dropdownWidth }}
               >
+                <Link
+                to="/dashboard"
+                  // onClick={handleProfile}
+                  className="flex items-center gap-2 w-full px-4 py-2 hover:bg-black hover:text-white"
+                >
+                  <User size={18} />
+                  Profile
+                </Link>
+
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-center hover:bg-black hover:text-white"
+                  className="flex items-center gap-2 w-full px-4 py-2 hover:bg-black hover:text-white"
                 >
                   <LogOut size={18} />
                   Logout
