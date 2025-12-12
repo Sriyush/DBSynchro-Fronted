@@ -5,6 +5,8 @@ import {
   UserData,
   handleCreateTable,
   viewTable,
+  checkSheet,
+  SyncTable,
 } from "../helpers/api";
 
 export function useMe() {
@@ -58,3 +60,25 @@ export function useViewTable(tableName: string | null) {
   });
 }
 
+export function useCheckSheet(sheetId: string, sheetTab: string | null) {
+  return useQuery({
+    queryKey: ["checkTable", sheetId, sheetTab],
+    queryFn: () => checkSheet(sheetId, sheetTab!),
+    enabled: !!sheetId && !!sheetTab,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSyncTable(sheetId: string, sheetTab: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => SyncTable(sheetId, sheetTab),
+
+    onSuccess: () => {
+      // refresh metadata + preview
+      queryClient.invalidateQueries({ queryKey: ["checkTable", sheetId, sheetTab] });
+      queryClient.invalidateQueries({ queryKey: ["preview", sheetId, sheetTab] });
+    },
+  });
+}

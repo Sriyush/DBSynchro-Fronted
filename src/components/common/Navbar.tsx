@@ -10,12 +10,13 @@ export function Navbar() {
   const user = useUser((s) => s.user);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
+  const { resetUser } = useUser();
   const buttonRef = useRef<HTMLDivElement>(null);
   const [dropdownWidth, setDropdownWidth] = useState(0);
   const location = useLocation();
   const handleLogout = async () => {
     await logout();
+    resetUser();
     navigate("/");
   };
 
@@ -41,8 +42,8 @@ export function Navbar() {
       logo={logo}
       items={[
         { label: "Home", href: "/" },
-        { label: "About", href: "/about" },
-        { label: "Services", href: "/services" },
+        // { label: "About", href: "/about" },
+        // { label: "Services", href: "/services" },
         { label: "Dashboard", href: "/dashboard" },
       ]}
       activeHref={location.pathname}
@@ -75,11 +76,11 @@ export function Navbar() {
               exit={{ opacity: 0, y: -8 }}
               style={{ width: dropdownWidth }}
             >
-              <Link to="/dashboard" className="flex gap-2 px-4 py-2 hover:bg-black hover:text-white">
+              <Link to="/dashboard" className="flex gap-2 px-4 py-2 hover:bg-black hover:text-white rounded-t-lg">
                 <User size={18} /> Profile
               </Link>
 
-              <button onClick={handleLogout} className="flex gap-2 px-4 py-2 hover:bg-black hover:text-white">
+              <button onClick={handleLogout} className="flex w-full rounded-b-lg gap-2 px-4 py-2 hover:bg-black hover:text-white">
                 <LogOut size={18} /> Logout
               </button>
             </motion.div>

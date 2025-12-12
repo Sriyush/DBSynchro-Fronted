@@ -1,4 +1,4 @@
-import { usePreviewSheet,  useCreateTable} from "@/hooks/query";
+import { usePreviewSheet,  useCreateTable, useCheckSheet, useSyncTable} from "@/hooks/query";
 import { extractSheetId } from "@/helpers/helperFuncs";
 import { useEffect, useState } from "react";
 import { SheetPreview } from "./SheetPreview";
@@ -12,8 +12,6 @@ export function CreateSync() {
     null
   );
   const previewQuery = usePreviewSheet(sheetId, selectedSheet ?? undefined);
-
-  // const previewQuery = usePreviewSheet(sheetId);
   const queryClient = useQueryClient();
   const handleExtract = () => {
     const id = extractSheetId(sheetUrl);
@@ -22,10 +20,9 @@ export function CreateSync() {
 
     setSelectedSheet(null);
   };
-  // const tableCheck = useCheckTable(sheetId);
+  const syncMutation = useSyncTable(sheetId, selectedSheet ?? "");
   const createTableMutation = useCreateTable(sheetId);
-  // const createSyncMutation = useCreateSync();
-  // const runSyncMutation = useRunSync();
+  const checkQuery = useCheckSheet(sheetId, selectedSheet);
 
 
   useEffect(() => {
@@ -76,99 +73,66 @@ export function CreateSync() {
         </div>
       )}
 
-      {/* ==============================
-          ERROR MESSAGE
-      =============================== */}
+
       {previewQuery.isError && (
         <div className="text-center text-red-600 font-medium py-4">
           ❌ Error loading sheet: {previewQuery.error?.message}
         </div>
       )}
 
-      {/* ==============================
-          SHOW PREVIEW WHEN DATA EXISTS
-      =============================== */}
-{previewQuery.data?.rows && !previewQuery.isPending && (
-  <>
-    <SheetPreview
-      columns={previewQuery.data.columns}
-      rows={previewQuery.data.rows}
-    />
+      {previewQuery.data?.rows && !previewQuery.isPending && (
+        <>
+          <SheetPreview
+            columns={previewQuery.data.columns}
+            rows={previewQuery.data.rows}
+          />
 
-<div className="mt-6 flex gap-4">
+          <div className="mt-6 flex flex-col gap-4 items-center w-full justify-center">
 
-  {/* 1️⃣ CREATE TABLE */}
+            {checkQuery.isLoading && (
+              <p className="text-gray-600 text-sm">Checking table status...</p>
+            )}
+
+            {checkQuery.data?.exists && !checkQuery.isLoading && (
+              <div className="p-3  flex items-center justify-center gap-2 border-4 border-black rounded-lg text-black w-[50%]">
+                <p className="font-medium">⚠️ Table already exists for this sheet and tab.</p>
+                <button
+                  onClick={() => console.log("Go to edit table")}
+                  className=" px-3 py-2 bg-black text-white rounded-lg border-2 hover:bg-white hover:text-black border-black hover:bg-blue-700"
+                >
+                  Wanna edit it? →
+                </button>
+              </div>
+            )}
+
+{checkQuery.data?.exists && checkQuery.data.changed && (
   <button
-    onClick={() =>
-      createTableMutation.mutate({
-        selectedSheet: selectedSheet!,
-        columns: previewQuery.data.columns,
-        rows: previewQuery.data.rows
-      })
-    }
-    disabled={createTableMutation.isPending}
-    className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+    onClick={() => syncMutation.mutate()}
+    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
   >
-    {createTableMutation.isPending ? "Creating..." : "Create Table"}
+    🔄 Sync Changes
   </button>
-
-  {/* 2️⃣ CREATE CONFIG */}
-  {/* <button
-    onClick={() => {
-      // const tableName = prompt("Enter table name for sync:");
-      // if (!tableName) return;
-
-      const mapping: Record<string, string> = {};
-      previewQuery.data.columns.forEach((col: string) => {
-        mapping[col] = col.replace(/\s+/g, "_").toLowerCase();
-      });
-
-      createSyncMutation.mutate({
-        sheetId,
-        sheetRange: selectedSheet!,
-        userTableId: 1,
-        mapping,
-      });
-    }}
-    disabled={createSyncMutation.isPending}
-    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 disabled:opacity-50"
-  >
-    {createSyncMutation.isPending ? "Saving..." : "Save Sync Config"}
-  </button> */}
-
-  {/* 3️⃣ RUN SYNC */}
-  {/* <button
-    onClick={() => {
-      const configId = prompt("Enter config ID to run sync:");
-      if (!configId) return;
-
-      runSyncMutation.mutate(Number(configId));
-    }}
-    disabled={runSyncMutation.isPending}
-    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 disabled:opacity-50"
-  >
-    {runSyncMutation.isPending ? "Running..." : "Run Sync"}
-  </button> */}
-
-</div>
-
-
-    {/* STATUS */}
-    {/* {tableCheck.data && (
-      <div className="text-center mt-3 font-medium">
-        {tableCheck.data.exists ? (
-          <span className="text-yellow-600">
-            ⚠ Table already exists — update mapping
-          </span>
-        ) : (
-          <span className="text-green-600">
-            ✔ Table will be created automatically
-          </span>
-        )}
-      </div>
-    )} */}
-  </>
 )}
+
+            {!checkQuery.data?.exists && (
+              <button
+                onClick={() =>
+                  createTableMutation.mutate({
+                    selectedSheet: selectedSheet!,
+                    columns: previewQuery.data.columns,
+                    rows: previewQuery.data.rows,
+                  })
+                }
+                disabled={createTableMutation.isPending}
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 mx-auto"
+              >
+                {createTableMutation.isPending ? "Creating..." : "Create Table"}
+              </button>
+            )}
+
+          </div>
+        </>
+      )}
 
     </div>
   );

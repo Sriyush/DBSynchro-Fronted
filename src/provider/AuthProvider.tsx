@@ -11,26 +11,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const session = data.session;
 
       if (session?.user) {
-        setUser({
+        setUser((prev) => ({
+          ...prev,
           id: session.user.id,
           email: session.user.email!,
           name: session.user.user_metadata.full_name,
           avatar: session.user.user_metadata.avatar_url,
-          tables: [],
-        });
+        }));
       }
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        if (session?.provider_token) {
+          localStorage.setItem("google_access_token", session.provider_token);
+        }
+
+        if (session?.provider_refresh_token) {
+          localStorage.setItem("google_refresh_token", session.provider_refresh_token);
+        }
+
+        if (event === "SIGNED_OUT") {
+          localStorage.removeItem("google_access_token");
+          localStorage.removeItem("google_refresh_access");
+          setUser(null); // reset everything
+          return;
+        }
+
         if (session?.user) {
-          setUser({
+          setUser((prev) => ({
+            ...prev,
             id: session.user.id,
             email: session.user.email!,
             name: session.user.user_metadata.full_name,
             avatar: session.user.user_metadata.avatar_url,
-            tables: [],
-          });
+          }));
         } else {
           setUser(null);
         }
@@ -46,16 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!data) return;
+
     const { user, tables } = data;
 
     if (user) {
-      setUser({
+      setUser((prev) => ({
+        ...prev,
         id: user.supabaseId,
         email: user.email,
         name: user.name,
         avatar: user.avatar,
-        tables,
-      });
+        tables, // only place tables update should happen
+      }));
     }
   }, [data, setUser]);
 

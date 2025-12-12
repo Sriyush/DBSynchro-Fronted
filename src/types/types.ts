@@ -3,7 +3,7 @@ export interface User {
     email: string;
     name: string;
     avatar:string;
-    tables: TableInfo[]
+    tables?: TableInfo[]
 }
 
 export interface TableInfo {
@@ -27,5 +27,6 @@ export type CreateSync = {
 
 export interface UserState {
     user: User| null;
-    setUser: (u: User | null) => void
+    setUser: (u: User | null | ((prev: User | null) => User | null)) => void;
+    resetUser:()=> void
 }
