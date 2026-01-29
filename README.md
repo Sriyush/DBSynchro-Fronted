@@ -1,74 +1,57 @@
-# React + TypeScript + Vite
+# 🦇 DBSynchro Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**The Dashboard for Your Data.**
 
-Currently, two official plugins are available:
+DBSynchro Frontend is the sleek, modern control center for managing your synchronized databases. Built for speed and usability, it lets you view, edit, and manage your Postgres tables that are linked to Google Sheets.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **User Dashboard:** View all your synced tables in one place.
+*   **Table Management:**
+    *   **View Data:** Clean, responsive table layout.
+    *   **Edit Rows:** Inline editing with instant sync.
+    *   **Add Data:** Create new rows and columns on the fly.
+*   **Custom Settings:** Configure your own Postgres database connection securely.
+*   **Google Integration:** Sign in with Google and browse your Sheets instantly.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   **Framework:** React 19 + Vite (Blazing fast).
+*   **Language:** TypeScript.
+*   **Styling:** Tailwind CSS v4.
+*   **State:** Zustand (Global) + React Query (Async).
+*   **Icons:** Lucide React.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚡ Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  **Clone & Install**
+    ```bash
+    git clone https://github.com/Sriyush/DBSynchro-Fronted.git
+    cd DBSynchro-Fronted
+    pnpm install
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Environment Variables**
+    Create a `.env` file:
+    ```env
+    VITE_SUPABASE_URL=...
+    VITE_SUPABASE_ANON_KEY=...
+    VITE_BACKEND_URL=http://localhost:4000
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3.  **Run Dev Server**
+    ```bash
+    pnpm dev
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🔮 Future Roadmap
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# DBSynchro-Fronted
+*   [ ] **Pagination:** Handle massive tables efficiently.
+*   [ ] **Filtering:** Search and filter rows instantly.
+*   [ ] **Realtime:** Live updates using Supabase Realtime.
+
+---
+
+*Built with 🖤 by Sriyush & Clanker.*
