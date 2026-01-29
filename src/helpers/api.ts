@@ -72,17 +72,11 @@ const { token, googleToken } = await getTokens();
 export async function handleCreateTable(
   sheetId: string,
   selectedSheet: string,
+  tableName: string,
   columns: string[],
   rows: string[][],
 ) {
-  if (!sheetId || !selectedSheet) return;
-
-  const tableName = prompt(
-    "Enter table name:",
-    selectedSheet.replace(/\s+/g, "_")
-  );
-
-  if (!tableName) return;
+  if (!sheetId || !selectedSheet || !tableName) return;
 
   const { token, googleToken } = await getTokens();
 
@@ -103,7 +97,10 @@ export async function handleCreateTable(
   });
 
   const data = await res.json();
-  alert("Table created: " + data.table.tableName);
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to create table");
+  }
+  return data;
 }
 
 
@@ -135,3 +132,94 @@ export async function SyncTable(sheetId:string , sheetTab: string){
   });
   return res.json();
 }
+
+export async function addRow(tableName: string, rowData: Record<string, any>) {
+  const { token, googleToken } = await getTokens();
+  const res = await fetch(`${BACKEND_URL}/api/table/${tableName}/row`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "provider-token": googleToken,
+    },
+    body: JSON.stringify(rowData),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to add row");
+  }
+  return res.json();
+}
+
+export async function addColumn(tableName: string, columnName: string) {
+  const { token, googleToken } = await getTokens();
+  const res = await fetch(`${BACKEND_URL}/api/table/${tableName}/column`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "provider-token": googleToken,
+    },
+    body: JSON.stringify({ columnName }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to add column");
+  }
+  return res.json();
+}
+
+export async function updateRow(tableName: string, id: number | string, updates: Record<string, any>) {
+  const { token, googleToken } = await getTokens();
+  const res = await fetch(`${BACKEND_URL}/api/table/${tableName}/row/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "provider-token": googleToken,
+    },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to update row");
+  }
+  return res.json();
+}
+
+// Generic API helper for PUT/POST/GET
+export const api = {
+  get: async (endpoint: string) => {
+    const { token, googleToken } = await getTokens();
+    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "provider-token": googleToken,
+      },
+    });
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || `API Error: ${res.statusText}`);
+    }
+    return res.json();
+  },
+  
+  put: async (endpoint: string, body: any) => {
+    const { token, googleToken } = await getTokens();
+    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "provider-token": googleToken,
+      },
+      body: JSON.stringify(body),
+    });
+    
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || error.message || "Request failed");
+    }
+    return res.json();
+  }
+};

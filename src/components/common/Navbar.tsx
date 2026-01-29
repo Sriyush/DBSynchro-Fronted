@@ -3,7 +3,7 @@ import { useUser } from "../../store/ZustandStore";
 import { loginWithGoogle, logout } from "../../helpers/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, User, Settings } from "lucide-react";
 import PillNav from "../PillNav";
 import logo from "/Logowhite.png";
 export function Navbar() {
@@ -42,9 +42,8 @@ export function Navbar() {
       logo={logo}
       items={[
         { label: "Home", href: "/" },
-        // { label: "About", href: "/about" },
-        // { label: "Services", href: "/services" },
         { label: "Dashboard", href: "/dashboard" },
+        { label: "Settings", href: "/settings" },
       ]}
       activeHref={location.pathname}
       className="custom-nav"
@@ -77,7 +76,10 @@ export function Navbar() {
               style={{ width: dropdownWidth }}
             >
               <Link to="/dashboard" className="flex gap-2 px-4 py-2 hover:bg-black hover:text-white rounded-t-lg">
-                <User size={18} /> Profile
+                <User size={18} /> Dashboard
+              </Link>
+              <Link to="/settings" className="flex gap-2 px-4 py-2 hover:bg-black hover:text-white">
+                <Settings size={18} /> Settings
               </Link>
 
               <button onClick={handleLogout} className="flex w-full rounded-b-lg gap-2 px-4 py-2 hover:bg-black hover:text-white">

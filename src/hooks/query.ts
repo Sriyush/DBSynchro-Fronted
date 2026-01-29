@@ -7,7 +7,44 @@ import {
   viewTable,
   checkSheet,
   SyncTable,
+  addRow,
+  addColumn,
+  updateRow,
+  api, // Exporting the new api object
 } from "../helpers/api";
+
+export { api }; // Re-exporting it for direct use in components
+
+export function useUpdateRow(tableName: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: number | string; updates: Record<string, any> }) =>
+      updateRow(tableName, id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["view-table", tableName] });
+    },
+  });
+}
+
+export function useAddRow(tableName: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (rowData: Record<string, any>) => addRow(tableName, rowData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["view-table", tableName] });
+    },
+  });
+}
+
+export function useAddColumn(tableName: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (columnName: string) => addColumn(tableName, columnName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["view-table", tableName] });
+    },
+  });
+}
 
 export function useMe() {
   return useQuery({
@@ -37,14 +74,16 @@ export function useCreateTable(sheetId: string) {
   return useMutation({
     mutationFn: ({
       selectedSheet,
+      tableName,
       columns,
       rows,
     }: {
       selectedSheet: string;
+      tableName: string;
       columns: string[];
       rows: string[][];
     }) =>
-      handleCreateTable(sheetId, selectedSheet, columns,rows),
+      handleCreateTable(sheetId, selectedSheet, tableName, columns,rows),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["checkTable", sheetId] });
