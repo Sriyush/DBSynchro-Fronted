@@ -2,10 +2,8 @@
 import type { TableInfo, User } from "@/types/types";
 
 export function Sidebar({info, tables}: {info: User | null, tables:TableInfo[] | undefined}) {
-
-
   return (
-    <aside className="w-120 bg-white shadow rounded-xl p-6  my-2  border-6 border-black h-[calc(100vh-120px)] sticky top-24">
+    <aside className="w-full md:w-80 bg-white shadow rounded-xl p-6 border-4 md:border-6 border-black md:h-[calc(100vh-120px)] md:sticky md:top-24 h-auto">
       {/* USER CARD */}
       <div className="flex flex-col items-center text-center">
         <img

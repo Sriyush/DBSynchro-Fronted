@@ -3,6 +3,7 @@ import { useViewTable, useAddRow, useAddColumn, useUpdateRow } from "../hooks/qu
 import { ArrowLeft, Plus, Database, Columns, Edit2, Check, X } from "lucide-react";
 import { useState } from "react";
 import { Modal } from "../components/common/Modal";
+import { motion } from "framer-motion";
 
 export function TableDetail() {
   const { tableName } = useParams<{ tableName: string }>();
@@ -75,53 +76,61 @@ export function TableDetail() {
   if (!data) return <div className="p-10 text-center">Table not found</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 px-8">
+    <motion.div 
+      className="min-h-screen bg-gray-50 pt-20 px-4 md:px-8 pb-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="p-2 bg-white border rounded-lg hover:bg-gray-100 transition">
+      <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <Link to="/dashboard" className="p-2 bg-white border rounded-lg hover:bg-gray-100 transition shrink-0">
             <ArrowLeft size={20} />
           </Link>
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Database size={24} className="text-blue-600" />
-              {tableName}
+          <div className="overflow-hidden">
+            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2 truncate">
+              <Database size={24} className="text-blue-600 shrink-0" />
+              <span className="truncate">{tableName}</span>
             </h1>
-            <p className="text-gray-500 text-sm">{data.rows.length} rows • {data.columns.length} columns</p>
+            <p className="text-gray-500 text-sm truncate">{data.rows.length} rows • {data.columns.length} columns</p>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full md:w-auto">
           <button 
             onClick={() => setIsColModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition shadow-sm font-medium"
+            className="flex-1 md:flex-none justify-center items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition shadow-sm font-medium whitespace-nowrap"
           >
             <Columns size={18} />
-            Add Column
+            <span className="hidden sm:inline">Add Column</span>
+            <span className="sm:hidden">Col</span>
           </button>
           <button 
             onClick={() => setIsRowModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition shadow-lg font-medium"
+            className="flex-1 md:flex-none justify-center items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition shadow-lg font-medium whitespace-nowrap"
           >
             <Plus size={18} />
-            Add Row
+            <span className="hidden sm:inline">Add Row</span>
+            <span className="sm:hidden">Row</span>
           </button>
         </div>
       </div>
 
       {/* Table Area */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col max-h-[calc(100vh-200px)]">
+        <div className="overflow-auto flex-1">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
               <tr>
-                <th className="px-4 py-4 w-10">#</th>
+                <th className="px-4 py-4 w-10 bg-gray-50">#</th>
                 {data.columns.map((col: string) => (
-                  <th key={col} className="px-6 py-4 font-medium whitespace-nowrap">
+                  <th key={col} className="px-6 py-4 font-medium whitespace-nowrap bg-gray-50 min-w-[150px]">
                     {col}
                   </th>
                 ))}
-                <th className="px-4 py-4 w-20 text-right">Actions</th>
+                <th className="px-4 py-4 w-20 text-right bg-gray-50 sticky right-0 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -146,7 +155,7 @@ export function TableDetail() {
                       </td>
                     ))}
 
-                    <td className="px-4 py-4 text-right">
+                    <td className={`px-4 py-4 text-right sticky right-0 ${isEditing ? "bg-blue-50" : "bg-white group-hover:bg-gray-50"} shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]`}>
                       {isEditing ? (
                         <div className="flex gap-2 justify-end">
                           <button onClick={saveEdit} className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200">
@@ -241,6 +250,6 @@ export function TableDetail() {
         </div>
       </Modal>
 
-    </div>
+    </motion.div>
   );
 }

@@ -7,8 +7,8 @@ export function UserDashboard() {
   const tables = user?.tables;
 
   return (
-    <div className="flex pt-20 px-10 gap-10 min-h-screen bg-gray-50   ">
-      <Sidebar  info={user} tables={tables}/>
+    <div className="flex flex-col md:flex-row pt-24 px-4 md:px-10 gap-6 md:gap-10 min-h-screen bg-gray-50">
+      <Sidebar info={user} tables={tables}/>
 
       <div className="flex-1 overflow-y-auto pb-20">
         <MainContent user={user} tables={tables} />

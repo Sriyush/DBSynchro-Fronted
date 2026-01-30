@@ -61,7 +61,8 @@ export function usePreviewSheet(sheetId: string, tab?: string) {
   return useQuery({
     queryKey: ["preview", sheetId, tab ?? "default"],
     queryFn: () => previewSheet(sheetId, tab),
-    enabled: !!sheetId,
+    enabled: Boolean(sheetId && sheetId.length > 5), // Only fetch if ID looks real
+    retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });

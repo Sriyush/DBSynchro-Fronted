@@ -6,16 +6,16 @@ export function SheetPreview({
   rows: (string | number)[][];
 }) {
   return (
-    <div className="overflow-auto border-6 border-black rounded-xl max-h-[500px] max-w-4xl mx-auto p-2">
-      <table className="w-full border-collapse ">
+    <div className="overflow-auto w-full">
+      <table className="w-full text-left">
         
         {/* Header */}
-        <thead className="bg-gray-200">
+        <thead className="bg-gray-100 border-b border-gray-300">
           <tr>
             {columns.map((col) => (
               <th 
                 key={col} 
-                className="px-4 py-2 border border-black font-bold text-left"
+                className="px-6 py-4 font-bold text-gray-700 whitespace-nowrap"
               >
                 {col}
               </th>
@@ -26,11 +26,11 @@ export function SheetPreview({
         {/* Body */}
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="even:bg-gray-50">
+            <tr key={i} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
               {row.map((cell, j) => (
                 <td 
                   key={j} 
-                  className="px-4 py-2 border border-gray-400"
+                  className="px-6 py-4 text-gray-600 whitespace-nowrap"
                 >
                   {cell}
                 </td>
