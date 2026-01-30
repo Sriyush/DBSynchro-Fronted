@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Github, Twitter, Linkedin } from "lucide-react";
 
