@@ -4,7 +4,7 @@ export function loginWithGoogle() {
   return supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "http://localhost:5173",
+      redirectTo: "https://db-synchro-fronted.vercel.app/",
       scopes: "email profile openid https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly",
       queryParams: {
         access_type: "offline",
