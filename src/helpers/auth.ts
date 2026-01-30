@@ -1,10 +1,13 @@
 import { supabase } from "../provider/supabaseClient";
 
 export function loginWithGoogle() {
+  // Use the current window location as the base, ensuring it works for both localhost and Vercel
+  const redirectUrl = window.location.origin; 
+  
   return supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "https://db-synchro-fronted.vercel.app/",
+      redirectTo: redirectUrl,
       scopes: "email profile openid https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly",
       queryParams: {
         access_type: "offline",

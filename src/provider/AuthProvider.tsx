@@ -1,80 +1,49 @@
 import { useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import { useUser } from "../store/ZustandStore";
-import { useMe } from "@/hooks/query";
+import { useNavigate } from "react-router-dom";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const setUser = useUser((s) => s.setUser);
+  const { setUser, resetUser } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const session = data.session;
-
+    // 1. Check for initial session (including URL hash handling)
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        setUser((prev) => ({
-          ...prev,
-          id: session.user.id,
-          email: session.user.email!,
+        setUser({
           name: session.user.user_metadata.full_name,
+          email: session.user.email!,
           avatar: session.user.user_metadata.avatar_url,
-        }));
+          id: session.user.id,
+        });
       }
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.provider_token) {
-          localStorage.setItem("google_access_token", session.provider_token);
+    // 2. Listen for auth changes (Login, Logout, Token Refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata.full_name,
+          email: session.user.email!,
+          avatar: session.user.user_metadata.avatar_url,
+          id: session.user.id,
+        });
+        
+        // Optional: If we just signed in, maybe redirect to dashboard?
+        if (event === "SIGNED_IN") {
+           // We can decide logic here, but keeping it simple for now
         }
 
-        if (session?.provider_refresh_token) {
-          localStorage.setItem("google_refresh_token", session.provider_refresh_token);
-        }
-
-        if (event === "SIGNED_OUT") {
-          localStorage.removeItem("google_access_token");
-          localStorage.removeItem("google_refresh_access");
-          setUser(null); // reset everything
-          return;
-        }
-
-        if (session?.user) {
-          setUser((prev) => ({
-            ...prev,
-            id: session.user.id,
-            email: session.user.email!,
-            name: session.user.user_metadata.full_name,
-            avatar: session.user.user_metadata.avatar_url,
-          }));
-        } else {
-          setUser(null);
-        }
+      } else if (event === "SIGNED_OUT") {
+        resetUser();
+        navigate("/");
       }
-    );
+    });
 
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, [setUser]);
-
-  const { data } = useMe();
-
-  useEffect(() => {
-    if (!data) return;
-
-    const { user, tables } = data;
-
-    if (user) {
-      setUser((prev) => ({
-        ...prev,
-        id: user.supabaseId,
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar,
-        tables, // only place tables update should happen
-      }));
-    }
-  }, [data, setUser]);
+    return () => subscription.unsubscribe();
+  }, [setUser, resetUser, navigate]);
 
   return <>{children}</>;
 }
