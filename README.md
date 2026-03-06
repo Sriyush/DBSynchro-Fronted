@@ -54,4 +54,4 @@ DBSynchro Frontend is the sleek, modern control center for managing your synchro
 
 ---
 
-*Built with 🖤 by Sriyush & Clanker.*
+*Built with 🖤 by Sriyush .*
